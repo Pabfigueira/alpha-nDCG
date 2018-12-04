@@ -42,7 +42,6 @@ class AlphaNDCG(object):
 	def compute_Alpha_DCG(self, ranking_query_doc, depth=20):
 		self.dcg_values = deepcopy( self.calculate_Alpha_DCG(ranking_query_doc = ranking_query_doc, depth = depth) )
 
-
 	def calculate_Alpha_nDCG(self, ranking_query_doc, depth=20):		
 		self.compute_Alpha_DCG(ranking_query_doc = ranking_query_doc, depth = depth)
 
@@ -71,17 +70,22 @@ class AlphaNDCG(object):
 			whoIsBest = "noOne"
 			topics_of_best = set()
 
+			# Memoization 
+			topics_intersections = {}
+			for document in doc_candidates:
+				topics_intersections[document] = deepcopy(set(self.doc_topics_dict[document]) & topics_query)
+
+
 			for document in doc_candidates:
 				value = 0.0
-				topics_intersection = (set(self.doc_topics_dict[document]) & topics_query)
 
-				for topic in topics_intersection:
+				for topic in topics_intersections[document]:
 					value += ((1 - self.alpha)**topics_number_of_occurrences[topic]) / log(2+len(ideal_ranking), 2)
 
 				if value > bestValue:
 					bestValue = deepcopy(value)
 					whoIsBest = deepcopy(document)
-					topics_of_best = deepcopy(topics_intersection)
+					topics_of_best = deepcopy(topics_intersections[document])
 
 			for topic in topics_of_best:
 				topics_number_of_occurrences[topic]+=1
