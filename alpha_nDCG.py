@@ -11,7 +11,7 @@ class AlphaNDCG(object):
 		self.dcg_values = {}
 		self.ndcg_values = {}
 
-	def set_alpha(self, alpha):
+	def set_alpha(self, alpha=0.5):
 		self.alpha = alpha
 		 
 	def load_query_topics(self, query_topics):
@@ -59,7 +59,7 @@ class AlphaNDCG(object):
 			for i in range(0,local_depth):
 				self.ndcg_values[query][i] = (self.dcg_values[query][i] / dcg_ideal_ranking[query][i])
 
-	def get_ideal_ranking(self, query, atual_ranking, depth):
+	def get_ideal_ranking(self, query, atual_ranking, depth=20):
 		ideal_ranking = []
 		topics_query = set(self.query_topics_dict[query])
 		topics_number_of_occurrences = dict(zip(topics_query, np.zeros(len(topics_query))))
