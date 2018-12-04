@@ -54,9 +54,11 @@ class AlphaNDCG(object):
 			
 			self.ndcg_values[query] = np.zeros(local_depth)
 
-			value = 0.0
 			for i in range(0,local_depth):
-				self.ndcg_values[query][i] = (self.dcg_values[query][i] / dcg_ideal_ranking[query][i])
+				if self.dcg_values[query][i] == 0.0:
+					self.ndcg_values[query][i] = 0.0
+				else:
+					self.ndcg_values[query][i] = (self.dcg_values[query][i] / dcg_ideal_ranking[query][i])
 
 	def get_ideal_ranking(self, query, atual_ranking, depth=20):
 		ideal_ranking = []
