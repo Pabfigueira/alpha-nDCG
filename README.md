@@ -36,7 +36,7 @@ rankingDict["QA Example"] = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
 rankingDict["QB Example"] = ['a', 'e', 'g', 'b', 'f', 'c', 'h', 'i', 'j', 'd']
 ```
 
-Single query, returns score
+Returns score
 ```python
 from alpha_nDCG import AlphaNDCG
 myAlpha = AlphaNDCG(query_topics = queryDict, doc_topics = docDict, alpha=0.5)
