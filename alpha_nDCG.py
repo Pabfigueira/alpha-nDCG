@@ -97,6 +97,40 @@ class AlphaNDCG(object):
 		return ideal_ranking
 
 
+	def compute_single_Alpha_DCG(self, query, ranking, depth=20):
+		topics_query = set(self.query_topics_dict[query])
+		topics_number_of_occurrences = dict(zip(topics_query, np.zeros(len(topics_query))))
+
+		local_depth = min(depth, len(ranking))
+		local_dcg_values = np.zeros(local_depth)
+
+		value = 0.0
+		for i in range(0,local_depth):
+			topics_intersection = (set(self.doc_topics_dict[ranking[i]]) & topics_query)
+
+			for topic in topics_intersection:
+				value += ((1 - self.alpha)**topics_number_of_occurrences[topic]) / log(2+i, 2)
+				topics_number_of_occurrences[topic]+=1
+			local_dcg_values[i] = deepcopy(value)
+		return local_dcg_values
+
+
+	def compute_single_Alpha_nDCG(self, query, target_ranking, ideal_ranking, depth=20):
+		local_depth = min( depth, min(len(target_ranking), len(ideal_ranking)) )
+
+		dcg_target_ranking = self.compute_single_Alpha_DCG(query=query, ranking=target_ranking, depth=local_depth) 
+		dcg_ideal_ranking  = self.compute_single_Alpha_DCG(query=query, ranking=ideal_ranking, depth=local_depth)
+
+		ndcg_values = np.zeros(local_depth)
+
+		for i in range(0,local_depth):
+			if dcg_target_ranking[i] == 0.0:
+				ndcg_values[i] = 0.0
+			else:
+				ndcg_values[i] = deepcopy( dcg_target_ranking[i]/dcg_ideal_ranking[i] )
+
+		return ndcg_values
+
 '''
 # Implemmenting [Clarke, 2008] example
 if __name__ == '__main__':
@@ -137,4 +171,10 @@ if __name__ == '__main__':
 	for query in myAlpha.ndcg_values:
 		print str(query) + ": " + str(myAlpha.ndcg_values[query])
 	print "\n"
+
+	# Testing single calculation
+	print "nDCG Values - Single"
+	ideal_ranking = myAlpha.get_ideal_ranking(query="QA Example", atual_ranking=rankingDict["QA Example"])
+	print "QB Example: " + str(myAlpha.compute_single_Alpha_nDCG(query="QA Example", target_ranking=rankingDict["QB Example"], ideal_ranking=ideal_ranking))
+	print "QA Example: " + str(myAlpha.compute_single_Alpha_nDCG(query="QA Example", target_ranking=rankingDict["QA Example"], ideal_ranking=ideal_ranking))
 '''
